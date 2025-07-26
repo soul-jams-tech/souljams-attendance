@@ -14,6 +14,7 @@
       align-items: center;
       padding: 20px;
     }
+
     .container {
       background: white;
       border-radius: 20px;
@@ -23,6 +24,7 @@
       width: 100%;
       text-align: center;
     }
+
     .logo {
       background: #f78a4d;
       color: white;
@@ -35,14 +37,35 @@
       border-radius: 20px;
       margin: 0 auto 20px;
     }
-    input {
+
+    select.dropdown {
       width: 100%;
       padding: 15px;
       margin: 10px 0 20px;
       border: 2px solid #e1e5e9;
       border-radius: 12px;
       font-size: 16px;
+      background-color: #f8f9fa;
+      color: #333;
+      transition: all 0.3s ease;
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%23442b1c" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.2rem;
     }
+
+    select.dropdown:focus {
+      outline: none;
+      border-color: #f78a4d;
+      background-color: white;
+      box-shadow: 0 0 0 3px rgba(247, 138, 77, 0.15);
+    }
+
+    select.dropdown option {
+      padding: 10px;
+    }
+
     button {
       padding: 15px;
       width: 48%;
@@ -53,80 +76,60 @@
       border-radius: 10px;
       cursor: pointer;
     }
+
     .btn-in {
       background: #f78a4d;
     }
+
     .btn-out {
       background: #e74c3c;
     }
+
     .status {
       margin-top: 20px;
       padding: 10px;
       border-radius: 10px;
       display: none;
     }
+
     .success {
       background: #d4edda;
       color: #155724;
     }
+
     .error {
       background: #f8d7da;
       color: #721c24;
     }
-    select.dropdown {
-  width: 100%;
-  padding: 15px;
-  border: 2px solid #e1e5e9;
-  border-radius: 12px;
-  font-size: 16px;
-  background-color: #f8f9fa;
-  color: #333;
-  transition: all 0.3s ease;
-  appearance: none;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23442b1c" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 1.2rem;
-}
-
-select.dropdown:focus {
-  outline: none;
-  border-color: #f78a4d;
-  background-color: white;
-  box-shadow: 0 0 0 3px rgba(247, 138, 77, 0.15);
-}
-
-select.dropdown option {
-  padding: 10px;
-}
-
   </style>
 </head>
 <body>
   <div class="container">
     <div class="logo">🏢</div>
     <h1>Office Attendance</h1>
-   <select id="employeeName" class="drowdown" required>
-  <option value="" disabled selected>Select your name</option>
-  <option>Manveer</option>
-  <option>Rachel</option>
-  <option>Sejal</option>
-  <option>Sheetal</option>
-  <option>Muthu</option>
-  <option>Varun</option>
-  <option>Jithin</option>
-  <option>Kamiloon</option>
-  <option>Shajahan</option>
-  <option>Kavya</option>
-  <option>Kushagra</option>
-  <option>Nidhi</option>
-  <option>Vishal</option>
-</select>
+
+    <select id="employeeName" class="dropdown" required>
+      <option value="" disabled selected>Select your name</option>
+      <option>Manveer</option>
+      <option>Rachel</option>
+      <option>Sejal</option>
+      <option>Sheetal</option>
+      <option>Muthu</option>
+      <option>Varun</option>
+      <option>Jithin</option>
+      <option>Kamiloon</option>
+      <option>Shajahan</option>
+      <option>Kavya</option>
+      <option>Kushagra</option>
+      <option>Nidhi</option>
+      <option>Vishal</option>
+    </select>
 
     <div>
       <button class="btn-in" onclick="recordAttendance('IN')">⏰ Clock In</button>
       <button class="btn-out" onclick="recordAttendance('OUT')">🚪 Clock Out</button>
     </div>
+
     <div id="status" class="status"></div>
   </div>
 
@@ -155,7 +158,7 @@ select.dropdown option {
     async function recordAttendance(action) {
       await checkAccess();
 
-      const name = document.getElementById('employeeName').value.trim();
+      const name = document.getElementById('employeeName').value;
       const statusEl = document.getElementById('status');
 
       if (!isAuthorized) {
@@ -163,7 +166,7 @@ select.dropdown option {
       }
 
       if (!name) {
-        return showStatus("Please enter your name.", 'error');
+        return showStatus("Please select your name.", 'error');
       }
 
       const url = new URL(GOOGLE_SHEET_WEBHOOK);
