@@ -73,14 +73,41 @@
       background: #f8d7da;
       color: #721c24;
     }
+    select.dropdown {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  font-size: 16px;
+  background-color: #f8f9fa;
+  color: #333;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23442b1c" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.2rem;
+}
+
+select.dropdown:focus {
+  outline: none;
+  border-color: #f78a4d;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(247, 138, 77, 0.15);
+}
+
+select.dropdown option {
+  padding: 10px;
+}
+
   </style>
 </head>
 <body>
   <div class="container">
     <div class="logo">🏢</div>
     <h1>Office Attendance</h1>
-   <select id="employeeName" required>
-  <option value="">Select your name</option>
+   <select id="employeeName" class="drowdown" required>
+  <option value="" disabled selected>Select your name</option>
   <option>Manveer</option>
   <option>Rachel</option>
   <option>Sejal</option>
