@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Office Attendance</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f78a4d 0%, #f78a4d 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .access-denied {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+    }
+
+    .access-denied h1 {
+      color: #e74c3c;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .access-denied p {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      display: none;
+    }
+
+    .container.show {
+      display: block;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: #f78a4d;
+      border-radius: 20px;
+      margin: 0 auto 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 16px;
+    }
+
+    .input-group {
+      margin-bottom: 25px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      color: #555;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #f78a4d;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(247, 138, 77, 0.2);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-in {
+      background: linear-gradient(135deg, #f78a4d, #f78a4d);
+      color: white;
+    }
+
+    .btn-out {
+      background: linear-gradient(135deg, #f44336, #da190b);
+      color: white;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      font-weight: 500;
+      display: none;
+    }
+
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .records {
+      text-align: left;
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 12px;
+      background: #f8f9fa;
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f78a4d;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #fff3;
+      border-top: 5px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 480px) {
+      .container, .access-denied {
+        padding: 30px 20px;
+      }
+      .btn-group {
+        flex-direction: column;
+      }
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading" id="loading"><div class="spinner"></div></div>
+
+  <div class="access-denied" id="accessDenied" style="display: none;">
+    <h1>🚫 Access Denied</h1>
+    <p>This attendance system can only be accessed from the office WiFi network.</p>
+    <p style="margin-top: 15px; font-size: 14px; color: #999;">Please connect to the office WiFi and try again.</p>
+  </div>
+
+  <div class="container" id="mainContainer">
+    <div class="logo">🏢</div>
+    <h1>Office Attendance</h1>
+    <p class="subtitle">Enter your name and clock in/out</p>
+
+    <div class="input-group">
+      <label for="employeeName">Your Name</label>
+      <input type="text" id="employeeName" placeholder="Enter your full name" required />
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-in" onclick="recordAttendance('IN')" id="clockInBtn">⏰ Clock IN</button>
+      <button class="btn-out" onclick="recordAttendance('OUT')" id="clockOutBtn">🚪 Clock OUT</button>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div class="records">
+      <h3 style="margin-bottom: 20px; color: #333;">Records are saved in Google Sheets</h3>
+    </div>
+  </div>
+
+  <script>
+    const GOOGLE_SHEET_WEBHOOK = 'https://script.google.com/macros/s/AKfycbxW6A6zp5sJcy1N8HCabLDHXcmlQn-JscD1X7lDBYVl-LcrDE0OSJ0HWeadBWXpc3FX_g/exec';
+
+    const OFFICE_CONFIG = {
+      allowedWiFiNames: ['Home AN_5G'], // browser can't access this, kept for completeness
+      allowedIPRanges: ['36.255.86.']
+    };
+
+    let isAuthorized = false;
+    let userIP = '';
+
+    async function getUserIP() {
+      try {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        return data.ip;
+      } catch {
+        return '';
+      }
+    }
+
+    async function checkOfficeNetwork() {
+      userIP = await getUserIP();
+      const isIPValid = OFFICE_CONFIG.allowedIPRanges.some(prefix => userIP.startsWith(prefix));
+      return isIPValid;
+    }
+
+    async function initializeApp() {
+      const loading = document.getElementById('loading');
+      const accessDenied = document.getElementById('accessDenied');
+      const mainContainer = document.getElementById('mainContainer');
+
+      isAuthorized = await checkOfficeNetwork();
+
+      if (isAuthorized) {
+        loading.style.display = 'none';
+        mainContainer.classList.add('show');
+      } else {
+        loading.style.display = 'none';
+        accessDenied.style.display = 'block';
+      }
+    }
+
+    async function recordAttendance(action) {
+      const name = document.getElementById('employeeName').value.trim();
+      if (!name) return showStatus('Please enter your name', 'error');
+      if (!isAuthorized) return showStatus('Access denied. Office network required.', 'error');
+
+      document.getElementById('clockInBtn').disabled = true;
+      document.getElementById('clockOutBtn').disabled = true;
+
+      try {
+        const payload = {
+          name: name,
+          action: action,
+          ip: userIP
+        };
+
+        console.log('Sending payload:', payload);
+
+        const res = await fetch(GOOGLE_SHEET_WEBHOOK, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        console.log('Response received:', result);
+
+        if (result.status === 'success') {
+          showStatus(`Successfully clocked ${action.toLowerCase()}!`, 'success');
+          document.getElementById('employeeName').value = '';
+        } else {
+          throw new Error(result.message || 'Unknown error');
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        showStatus('Error: ' + err.message, 'error');
+      } finally {
+        document.getElementById('clockInBtn').disabled = false;
+        document.getElementById('clockOutBtn').disabled = false;
+      }
+    }
+
+    function showStatus(message, type) {
+      const el = document.getElementById('status');
+      el.textContent = message;
+      el.className = `status ${type}`;
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 5000);
+    }
+
+    window.addEventListener('load', initializeApp);
+  </script>
+</body>
+</html>
